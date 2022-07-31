@@ -65,5 +65,5 @@ secondPrice, err := mf.GetValueByFieldPathDotNotation("prices.[1].value", produc
 ```
 
 ### Using Field Mapping
-Doc will be comming soon...
+Doc will be coming soon...
 
