@@ -1,0 +1,107 @@
+package converter
+
+import (
+	"strconv"
+	"strings"
+	"time"
+)
+
+type TypeConverter interface {
+}
+
+type typeConverter struct {
+	convertFunctionMap map[string]map[string]func(value any) (any, error)
+}
+
+func NewTypeConverter(convertFunctionMap map[string]map[string]func(value any) (any, error)) TypeConverter {
+	tc := typeConverter{
+		convertFunctionMap: convertFunctionMap,
+	}
+
+	if convertFunctionMap == nil {
+		// input to target type map
+		defaultFunctionMap := map[string]map[string]func(value any) (any, error){
+			"string": {
+				"varchar":  tc.GetStringFromAny,
+				"*string":  tc.GetStringPtrFromString,
+				"int":      tc.ConvertStringToInt,
+				"datetime": tc.ConvertDefaultDateTimeStringToTime,
+				"[]string": tc.ConvertStringToStringSlice,
+			},
+			"*string": {
+				"string": tc.GetStringFromStringPtr,
+			},
+			"int": {
+				"string":  tc.ConvertIntToString,
+				"varchar": tc.ConvertIntToString,
+			},
+			"int64": {
+				"string": tc.ConvertInt64ToString,
+			},
+			"[]uint8": {
+				"string": tc.ConvertUint8SliceToString,
+			},
+			"time.Time": {
+				"string": tc.ConvertTimeToString,
+			},
+			"float64": {
+				"float32": tc.ConvertFloat64ToFloat32,
+			},
+		}
+		tc.convertFunctionMap = defaultFunctionMap
+	}
+
+	return tc
+}
+
+func (typeConverter) GetStringFromAny(value any) (any, error) {
+	return value, nil
+}
+
+func (typeConverter) GetStringPtrFromString(value any) (any, error) {
+	return &value, nil
+}
+
+func (typeConverter) GetStringFromStringPtr(value any) (any, error) {
+	v := value.(*string)
+	if v == nil {
+		return nil, nil
+	}
+	return *v, nil
+}
+
+func (typeConverter) ConvertDefaultDateTimeStringToTime(value any) (any, error) {
+	return time.Parse("2006-02-01 15:04:05", value.(string))
+}
+
+func (typeConverter) ConvertStringToInt(value any) (any, error) {
+	return strconv.Atoi(value.(string))
+}
+
+func (typeConverter) ConvertInt64ToString(value any) (any, error) {
+	return strconv.Itoa(int(value.(int64))), nil
+}
+
+func (typeConverter) ConvertIntToString(value any) (any, error) {
+	return strconv.Itoa(value.(int)), nil
+}
+
+func (typeConverter) ConvertUint8SliceToString(value any) (any, error) {
+	return string(value.([]uint8)), nil
+}
+
+func (typeConverter) ConvertUint8SliceToFloat64(value any) (any, error) {
+	return strconv.ParseFloat(string(value.([]uint8)), 64)
+}
+
+func (typeConverter) ConvertTimeToString(value any) (any, error) {
+	return value.(time.Time).String(), nil
+}
+
+func (typeConverter) ConvertStringToStringSlice(value any) (any, error) {
+	return strings.Split(value.(string), ","), nil
+}
+
+func (typeConverter) ConvertFloat64ToFloat32(value any) (any, error) {
+	return float32(value.(float64)), nil
+}
