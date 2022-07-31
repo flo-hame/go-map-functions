@@ -7,6 +7,21 @@ import (
 )
 
 type TypeConverter interface {
+	GetMappedFieldValue(mapping FieldMapping, originalValue any) (any, error)
+	ConvertValue(value any, targetType string, convertingFunctions map[string]map[string]func(value any) (any, error)) (any, error)
+
+	GetStringFromAny(value any) (any, error)
+	GetStringPtrFromString(value any) (any, error)
+	GetStringFromStringPtr(value any) (any, error)
+	ConvertDefaultDateTimeStringToTime(value any) (any, error)
+	ConvertStringToInt(value any) (any, error)
+	ConvertInt64ToString(value any) (any, error)
+	ConvertIntToString(value any) (any, error)
+	ConvertUint8SliceToString(value any) (any, error)
+	ConvertUint8SliceToFloat64(value any) (any, error)
+	ConvertTimeToString(value any) (any, error)
+	ConvertStringToStringSlice(value any) (any, error)
+	ConvertFloat64ToFloat32(value any) (any, error)
 }
 
 type typeConverter struct {
