@@ -21,6 +21,9 @@ func (tc typeConverter) GetMappedFieldValue(mapping FieldMapping, originalValue 
 	if err != nil {
 		return nil, err
 	}
+	if convertedValue == nil {
+		return nil, err
+	}
 
 	if mapping.ValueMapping != nil && len(mapping.ValueMapping) > 0 {
 		for _, valueMapping := range mapping.ValueMapping {
@@ -42,6 +45,10 @@ func (tc typeConverter) GetMappedFieldValue(mapping FieldMapping, originalValue 
 //		"float32": convertStringToFloat32(value)
 // }
 func (tc typeConverter) ConvertValue(value any, targetType string, convertingFunctions map[string]map[string]func(value any) (any, error)) (any, error) {
+	if value == nil {
+		return nil, nil
+	}
+
 	inputValueType := reflect.TypeOf(value).String()
 	if inputValueType == targetType {
 		return value, nil
