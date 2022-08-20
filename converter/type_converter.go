@@ -22,6 +22,7 @@ type TypeConverter interface {
 	ConvertTimeToString(value any) (any, error)
 	ConvertStringToStringSlice(value any) (any, error)
 	ConvertFloat64ToFloat32(value any) (any, error)
+	ConvertFloat64ToInt64(value any) (any, error)
 }
 
 type typeConverter struct {
@@ -37,11 +38,12 @@ func NewTypeConverter(convertFunctionMap map[string]map[string]func(value any) (
 		// input to target type map
 		defaultFunctionMap := map[string]map[string]func(value any) (any, error){
 			"string": {
-				"varchar":  tc.GetStringFromAny,
-				"*string":  tc.GetStringPtrFromString,
-				"int":      tc.ConvertStringToInt,
-				"datetime": tc.ConvertDefaultDateTimeStringToTime,
-				"[]string": tc.ConvertStringToStringSlice,
+				"varchar":                tc.GetStringFromAny,
+				"*string":                tc.GetStringPtrFromString,
+				"int":                    tc.ConvertStringToInt,
+				"datetime":               tc.ConvertDefaultDateTimeStringToTime,
+				"americanDateTimeString": tc.ConvertInternationalDateTimeStringToAmerican,
+				"[]string":               tc.ConvertStringToStringSlice,
 			},
 			"*string": {
 				"string": tc.GetStringFromStringPtr,
@@ -88,6 +90,15 @@ func (typeConverter) GetStringFromStringPtr(value any) (any, error) {
 
 func (typeConverter) ConvertDefaultDateTimeStringToTime(value any) (any, error) {
 	return time.Parse("2006-01-02 15:04:05", value.(string))
+}
+
+func (typeConverter) ConvertInternationalDateTimeStringToAmerican(value any) (any, error) {
+	convertedTime, err := time.Parse("2006-01-02 15:04:05", value.(string))
+	if err != nil {
+		return nil, err
+	}
+
+	return convertedTime.Format("2006-02-01 15:04:05"), nil
 }
 
 func (typeConverter) ConvertStringToInt(value any) (any, error) {
