@@ -87,7 +87,7 @@ func (typeConverter) GetStringFromStringPtr(value any) (any, error) {
 }
 
 func (typeConverter) ConvertDefaultDateTimeStringToTime(value any) (any, error) {
-	return time.Parse("2006-01-02 15:04:05", value.(string))
+	return time.Parse("2006-02-01 15:04:05", value.(string))
 }
 
 func (typeConverter) ConvertStringToInt(value any) (any, error) {
