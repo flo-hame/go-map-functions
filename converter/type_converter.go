@@ -61,6 +61,7 @@ func NewTypeConverter(convertFunctionMap map[string]map[string]func(value any) (
 			},
 			"float64": {
 				"float32": tc.ConvertFloat64ToFloat32,
+				"int":     tc.ConvertFloat64ToInt64,
 			},
 		}
 		tc.convertFunctionMap = defaultFunctionMap
@@ -119,4 +120,8 @@ func (typeConverter) ConvertStringToStringSlice(value any) (any, error) {
 
 func (typeConverter) ConvertFloat64ToFloat32(value any) (any, error) {
 	return float32(value.(float64)), nil
+}
+
+func (typeConverter) ConvertFloat64ToInt64(value any) (any, error) {
+	return int64(value.(float64)), nil
 }
