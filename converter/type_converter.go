@@ -47,7 +47,7 @@ func NewTypeConverter(convertFunctionMap map[string]map[string]func(value any) (
 			},
 			"*string": {
 				"string":  tc.GetStringFromStringPtr,
-				"varchar": tc.GetStringPtrFromString,
+				"varchar": tc.GetStringFromStringPtr,
 			},
 			"int": {
 				"string":  tc.ConvertIntToString,
