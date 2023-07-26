@@ -44,13 +44,14 @@ func GetValueByFieldPathDotNotation(fieldPath string, mapStructure map[string]an
 	return value, nil
 }
 
-func getListMap(path string, value []map[string]any) (any, error) {
+func getListMap(path string, inputValues []map[string]any) (any, error) {
 	var values []any
-	for _, ele := range value {
-		_, err := GetValueByFieldPathDotNotation(path, ele)
+	for _, ele := range inputValues {
+		value, err := GetValueByFieldPathDotNotation(path, ele)
 		if err != nil {
 			return nil, err
 		}
+		values = append(values, value)
 	}
 	return values, nil
 }
