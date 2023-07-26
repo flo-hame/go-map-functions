@@ -33,10 +33,26 @@ func GetValueByFieldPathDotNotation(fieldPath string, mapStructure map[string]an
 			continue
 		}
 
-		value = value.(map[string]any)[path]
+		switch value.(type) {
+		case map[string]any:
+			value = value.(map[string]any)[path]
+		case []map[string]any:
+			return getListMap(path, value.([]map[string]any))
+		}
 	}
 
 	return value, nil
+}
+
+func getListMap(path string, value []map[string]any) (any, error) {
+	var values []any
+	for _, ele := range value {
+		_, err := GetValueByFieldPathDotNotation(path, ele)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return values, nil
 }
 
 func getIndexAccessNumber(path string) (*int, error) {
