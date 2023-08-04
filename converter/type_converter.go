@@ -80,7 +80,7 @@ func NewTypeConverter(convertFunctionMap map[string]map[string]func(value any) (
 				"int":     tc.ConvertFloat64ToInt,
 				"varchar": tc.ConvertFloat64ToString,
 				"string":  tc.ConvertFloat64ToString,
-				"decimal": tc.ConvertFloat64ToUint8,
+				"[]uint8": tc.ConvertFloat64ToUint8,
 			},
 		}
 		tc.convertFunctionMap = defaultFunctionMap
