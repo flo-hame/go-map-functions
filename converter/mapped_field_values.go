@@ -17,7 +17,16 @@ func (tc typeConverter) GetMappedFieldValue(mapping FieldMapping, originalValue 
 		return tc.ConvertValue(mapping.FixValue, targetType, tc.convertFunctionMap)
 	}
 
-	convertedValue, err := tc.ConvertValue(originalValue, targetType, tc.convertFunctionMap)
+	value := originalValue
+	if mapping.ValueMapping != nil && len(mapping.ValueMapping) > 0 {
+		for _, valueMapping := range mapping.ValueMapping {
+			if valueMapping.Source == originalValue {
+				value = valueMapping.Target
+			}
+		}
+	}
+
+	convertedValue, err := tc.ConvertValue(value, targetType, tc.convertFunctionMap)
 	if err != nil {
 		return nil, err
 	}
@@ -25,25 +34,21 @@ func (tc typeConverter) GetMappedFieldValue(mapping FieldMapping, originalValue 
 		return nil, err
 	}
 
-	if mapping.ValueMapping != nil && len(mapping.ValueMapping) > 0 {
-		for _, valueMapping := range mapping.ValueMapping {
-			if valueMapping.Source == convertedValue {
-				return valueMapping.Target, nil
-			}
-		}
-		return nil, nil
-	}
-
 	return convertedValue, nil
+}
+
+func isInteger(val float64) bool {
+	return val == float64(int(val))
 }
 
 // ConvertValue convert the input value to input target type by using the given converting functions
 // the input converting function map follows the structure => givenType: wishedType: convertingFunction
 // Example converting function map for converting string to int and string to float32:
-// "string":{
-//		"int": convertStringToInt(value),
-//		"float32": convertStringToFloat32(value)
-// }
+//
+//	"string":{
+//			"int": convertStringToInt(value),
+//			"float32": convertStringToFloat32(value)
+//	}
 func (tc typeConverter) ConvertValue(value any, targetType string, convertingFunctions map[string]map[string]func(value any) (any, error)) (any, error) {
 	if value == nil {
 		return nil, nil
