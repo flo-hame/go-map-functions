@@ -23,6 +23,7 @@ type TypeConverter interface {
 	ConvertStringToStringSlice(value any) (any, error)
 	ConvertFloat64ToFloat32(value any) (any, error)
 	ConvertFloat64ToInt64(value any) (any, error)
+	ConvertStringPtrToInt(value any) (any, error)
 }
 
 type typeConverter struct {
@@ -48,6 +49,7 @@ func NewTypeConverter(convertFunctionMap map[string]map[string]func(value any) (
 			"*string": {
 				"string":  tc.GetStringFromStringPtr,
 				"varchar": tc.GetStringFromStringPtr,
+				"int":     tc.ConvertStringPtrToInt,
 			},
 			"int": {
 				"string":  tc.ConvertIntToString,
@@ -136,4 +138,12 @@ func (typeConverter) ConvertFloat64ToFloat32(value any) (any, error) {
 
 func (typeConverter) ConvertFloat64ToInt64(value any) (any, error) {
 	return int64(value.(float64)), nil
+}
+
+func (tc typeConverter) ConvertStringPtrToInt(value any) (any, error) {
+	v := value.(*string)
+	if v == nil {
+		return nil, nil
+	}
+	return tc.ConvertStringToInt(*v)
 }
