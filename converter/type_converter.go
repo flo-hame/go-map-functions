@@ -26,6 +26,8 @@ type TypeConverter interface {
 	ConvertStringPtrToInt(value any) (any, error)
 	ConvertIntToInt64(value any) (any, error)
 	ConvertFloat64ToInt(value any) (any, error)
+	ConvertStringToFloat64(value any) (any, error)
+	ConvertStringToFloat32(value any) (any, error)
 }
 
 type typeConverter struct {
@@ -47,6 +49,8 @@ func NewTypeConverter(convertFunctionMap map[string]map[string]func(value any) (
 				"datetime":               tc.ConvertDefaultDateTimeStringToTime,
 				"americanDateTimeString": tc.ConvertInternationalDateTimeStringToAmerican,
 				"[]string":               tc.ConvertStringToStringSlice,
+				"float64":                tc.ConvertStringToFloat64,
+				"float32":                tc.ConvertStringToFloat32,
 			},
 			"*string": {
 				"string":  tc.GetStringFromStringPtr,
@@ -138,6 +142,14 @@ func (typeConverter) ConvertTimeToString(value any) (any, error) {
 
 func (typeConverter) ConvertStringToStringSlice(value any) (any, error) {
 	return strings.Split(value.(string), ","), nil
+}
+
+func (typeConverter) ConvertStringToFloat64(value any) (any, error) {
+	return strconv.ParseFloat(value.(string), 64)
+}
+
+func (typeConverter) ConvertStringToFloat32(value any) (any, error) {
+	return strconv.ParseFloat(value.(string), 32)
 }
 
 func (typeConverter) ConvertFloat64ToFloat32(value any) (any, error) {
