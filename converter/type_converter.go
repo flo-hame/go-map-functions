@@ -1,6 +1,7 @@
 package converter
 
 import (
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -29,6 +30,7 @@ type TypeConverter interface {
 	ConvertStringToFloat64(value any) (any, error)
 	ConvertStringToFloat32(value any) (any, error)
 	ConvertFloat64ToString(value any) (any, error)
+	ConvertFloat64ToUint8(value any) (any, error)
 }
 
 type typeConverter struct {
@@ -78,6 +80,7 @@ func NewTypeConverter(convertFunctionMap map[string]map[string]func(value any) (
 				"int":     tc.ConvertFloat64ToInt,
 				"varchar": tc.ConvertFloat64ToString,
 				"string":  tc.ConvertFloat64ToString,
+				"decimal": tc.ConvertFloat64ToUint8,
 			},
 		}
 		tc.convertFunctionMap = defaultFunctionMap
@@ -169,6 +172,17 @@ func (typeConverter) ConvertFloat64ToInt(value any) (any, error) {
 
 func (typeConverter) ConvertFloat64ToString(value any) (any, error) {
 	return strconv.FormatFloat(value.(float64), 'f', -1, 64), nil
+}
+
+func (typeConverter) ConvertFloat64ToUint8(value any) (any, error) {
+	bits := math.Float64bits(value.(float64))
+	bytes := make([]uint8, 8)
+
+	for i := 0; i < 8; i++ {
+		bytes[i] = uint8(bits >> uint(8*i))
+	}
+
+	return bytes, nil
 }
 
 func (tc typeConverter) ConvertStringPtrToInt(value any) (any, error) {
