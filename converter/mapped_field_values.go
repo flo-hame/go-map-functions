@@ -32,7 +32,7 @@ func (tc typeConverter) GetMappedFieldValue(mapping FieldMapping, originalValue 
 				return nil, err
 			}
 			if source == convertedValue {
-				return valueMapping.Target, nil
+				return tc.ConvertValue(valueMapping.Target, targetType, tc.convertFunctionMap)
 			}
 		}
 		return nil, nil
