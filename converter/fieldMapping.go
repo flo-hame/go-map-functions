@@ -8,6 +8,6 @@ type FieldMapping struct {
 }
 
 type FieldValueMapping struct {
-	Source string `json:"source"`
-	Target string `json:"target"`
+	Source any `json:"source"`
+	Target any `json:"target"`
 }
