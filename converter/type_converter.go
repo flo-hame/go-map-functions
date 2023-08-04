@@ -1,6 +1,7 @@
 package converter
 
 import (
+	"encoding/binary"
 	"math"
 	"strconv"
 	"strings"
@@ -176,11 +177,8 @@ func (typeConverter) ConvertFloat64ToString(value any) (any, error) {
 
 func (typeConverter) ConvertFloat64ToUint8(value any) (any, error) {
 	bits := math.Float64bits(value.(float64))
-	bytes := make([]uint8, 8)
-
-	for i := 0; i < 8; i++ {
-		bytes[i] = uint8(bits >> uint(8*i))
-	}
+	bytes := make([]byte, 8)
+	binary.LittleEndian.PutUint64(bytes, bits)
 
 	return bytes, nil
 }
