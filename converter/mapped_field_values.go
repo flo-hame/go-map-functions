@@ -17,16 +17,7 @@ func (tc typeConverter) GetMappedFieldValue(mapping FieldMapping, originalValue 
 		return tc.ConvertValue(mapping.FixValue, targetType, tc.convertFunctionMap)
 	}
 
-	value := originalValue
-	if mapping.ValueMapping != nil && len(mapping.ValueMapping) > 0 {
-		for _, valueMapping := range mapping.ValueMapping {
-			if valueMapping.Source == originalValue {
-				value = valueMapping.Target
-			}
-		}
-	}
-
-	convertedValue, err := tc.ConvertValue(value, targetType, tc.convertFunctionMap)
+	convertedValue, err := tc.ConvertValue(originalValue, targetType, tc.convertFunctionMap)
 	if err != nil {
 		return nil, err
 	}
@@ -34,11 +25,20 @@ func (tc typeConverter) GetMappedFieldValue(mapping FieldMapping, originalValue 
 		return nil, err
 	}
 
-	return convertedValue, nil
-}
+	if mapping.ValueMapping != nil && len(mapping.ValueMapping) > 0 {
+		for _, valueMapping := range mapping.ValueMapping {
+			source, err := tc.ConvertValue(valueMapping.Source, targetType, tc.convertFunctionMap)
+			if err != nil {
+				return nil, err
+			}
+			if source == convertedValue {
+				return valueMapping.Target, nil
+			}
+		}
+		return nil, nil
+	}
 
-func isInteger(val float64) bool {
-	return val == float64(int(val))
+	return convertedValue, nil
 }
 
 // ConvertValue convert the input value to input target type by using the given converting functions
