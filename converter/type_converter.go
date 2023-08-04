@@ -24,6 +24,8 @@ type TypeConverter interface {
 	ConvertFloat64ToFloat32(value any) (any, error)
 	ConvertFloat64ToInt64(value any) (any, error)
 	ConvertStringPtrToInt(value any) (any, error)
+	ConvertIntToInt64(value any) (any, error)
+	ConvertFloat64ToInt(value any) (any, error)
 }
 
 type typeConverter struct {
@@ -54,6 +56,7 @@ func NewTypeConverter(convertFunctionMap map[string]map[string]func(value any) (
 			"int": {
 				"string":  tc.ConvertIntToString,
 				"varchar": tc.ConvertIntToString,
+				"int64":   tc.ConvertIntToInt64,
 			},
 			"int64": {
 				"string": tc.ConvertInt64ToString,
@@ -115,6 +118,10 @@ func (typeConverter) ConvertInt64ToString(value any) (any, error) {
 
 func (typeConverter) ConvertIntToString(value any) (any, error) {
 	return strconv.Itoa(value.(int)), nil
+}
+
+func (typeConverter) ConvertIntToInt64(value any) (any, error) {
+	return int64(value.(int)), nil
 }
 
 func (typeConverter) ConvertUint8SliceToString(value any) (any, error) {
