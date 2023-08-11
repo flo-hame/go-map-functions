@@ -83,6 +83,9 @@ func NewTypeConverter(convertFunctionMap map[string]map[string]func(value any) (
 				"string":  tc.ConvertFloat64ToString,
 				"[]uint8": tc.ConvertFloat64ToUint8,
 			},
+			"*float64": {
+				"float64": tc.GetFloat64FromPtr,
+			},
 		}
 		tc.convertFunctionMap = defaultFunctionMap
 	}
@@ -189,4 +192,12 @@ func (tc typeConverter) ConvertStringPtrToInt(value any) (any, error) {
 		return nil, nil
 	}
 	return tc.ConvertStringToInt(*v)
+}
+
+func (tc typeConverter) GetFloat64FromPtr(value any) (any, error) {
+	v := value.(*float64)
+	if v == nil {
+		return nil, nil
+	}
+	return *v, nil
 }
