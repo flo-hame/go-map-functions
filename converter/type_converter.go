@@ -69,6 +69,11 @@ func NewTypeConverter(convertFunctionMap map[string]map[string]func(value any) (
 			"int64": {
 				"string": tc.ConvertInt64ToString,
 			},
+			"*int64": {
+				"int64":  tc.GetInt64FromPtr,
+				"int":    tc.GetIntFromInt64Ptr,
+				"string": tc.ConvertInt64ToString,
+			},
 			"[]uint8": {
 				"string": tc.ConvertUint8SliceToString,
 			},
@@ -104,7 +109,7 @@ func (typeConverter) GetStringPtrFromString(value any) (any, error) {
 func (typeConverter) GetStringFromStringPtr(value any) (any, error) {
 	v := value.(*string)
 	if v == nil {
-		return nil, nil
+		return "", nil
 	}
 	return *v, nil
 }
@@ -132,6 +137,22 @@ func (typeConverter) ConvertInt64ToString(value any) (any, error) {
 
 func (typeConverter) ConvertIntToString(value any) (any, error) {
 	return strconv.Itoa(value.(int)), nil
+}
+
+func (typeConverter) GetInt64FromPtr(value any) (any, error) {
+	v := value.(*int64)
+	if v == nil {
+		return int64(0), nil
+	}
+	return *v, nil
+}
+
+func (typeConverter) GetIntFromInt64Ptr(value any) (any, error) {
+	v := value.(*int64)
+	if v == nil {
+		return 0, nil
+	}
+	return int(*v), nil
 }
 
 func (typeConverter) ConvertIntToInt64(value any) (any, error) {
@@ -197,7 +218,7 @@ func (tc typeConverter) ConvertStringPtrToInt(value any) (any, error) {
 func (tc typeConverter) GetFloat64FromPtr(value any) (any, error) {
 	v := value.(*float64)
 	if v == nil {
-		return nil, nil
+		return float64(0), nil
 	}
 	return *v, nil
 }
