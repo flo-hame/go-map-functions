@@ -51,6 +51,8 @@ func NewTypeConverter(convertFunctionMap map[string]map[string]func(value any) (
 				"*string":                tc.GetStringPtrFromString,
 				"int":                    tc.ConvertStringToInt,
 				"datetime":               tc.ConvertStringToTime,
+				"date":                   tc.ConvertDateTimeStringToDateString,
+				"time":                   tc.ConvertDateTimeStringToDateString,
 				"americanDateTimeString": tc.ConvertInternationalDateTimeStringToAmerican,
 				"[]string":               tc.ConvertStringToStringSlice,
 				"float64":                tc.ConvertStringToFloat64,
@@ -132,6 +134,22 @@ func (typeConverter) ConvertStringToTime(value any) (any, error) {
 		return nil, err
 	}
 	return parsedTime, nil
+}
+
+func (tc typeConverter) ConvertDateTimeStringToDateString(value any) (any, error) {
+	convertedTime, err := tc.ConvertStringToTime(value)
+	if err != nil {
+		return nil, err
+	}
+	return convertedTime.(time.Time).Format("2006-02-01"), nil
+}
+
+func (tc typeConverter) ConvertDateTimeStringToTimeString(value any) (any, error) {
+	convertedTime, err := tc.ConvertStringToTime(value)
+	if err != nil {
+		return nil, err
+	}
+	return convertedTime.(time.Time).Format("15:04:05"), nil
 }
 
 func (tc typeConverter) ConvertInternationalDateTimeStringToAmerican(value any) (any, error) {
