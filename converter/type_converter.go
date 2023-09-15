@@ -15,7 +15,7 @@ type TypeConverter interface {
 	GetStringFromAny(value any) (any, error)
 	GetStringPtrFromString(value any) (any, error)
 	GetStringFromStringPtr(value any) (any, error)
-	ConvertDefaultDateTimeStringToTime(value any) (any, error)
+	ConvertStringToTime(value any) (any, error)
 	ConvertStringToInt(value any) (any, error)
 	ConvertInt64ToString(value any) (any, error)
 	ConvertIntToString(value any) (any, error)
@@ -50,7 +50,7 @@ func NewTypeConverter(convertFunctionMap map[string]map[string]func(value any) (
 				"varchar":                tc.GetStringFromAny,
 				"*string":                tc.GetStringPtrFromString,
 				"int":                    tc.ConvertStringToInt,
-				"datetime":               tc.ConvertDefaultDateTimeStringToTime,
+				"datetime":               tc.ConvertStringToTime,
 				"americanDateTimeString": tc.ConvertInternationalDateTimeStringToAmerican,
 				"[]string":               tc.ConvertStringToStringSlice,
 				"float64":                tc.ConvertStringToFloat64,
@@ -114,17 +114,33 @@ func (typeConverter) GetStringFromStringPtr(value any) (any, error) {
 	return *v, nil
 }
 
-func (typeConverter) ConvertDefaultDateTimeStringToTime(value any) (any, error) {
-	return time.Parse("2006-01-02 15:04:05", value.(string))
+func (typeConverter) ConvertStringToTime(value any) (any, error) {
+	timeLayouts := []string{
+		time.RFC3339,
+		"2006-01-02 15:04:05",
+	}
+
+	var parsedTime time.Time
+	var err error
+	for _, layout := range timeLayouts {
+		parsedTime, err = time.Parse(layout, value.(string))
+		if err == nil {
+			break
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	return parsedTime, nil
 }
 
-func (typeConverter) ConvertInternationalDateTimeStringToAmerican(value any) (any, error) {
-	convertedTime, err := time.Parse("2006-01-02 15:04:05", value.(string))
+func (tc typeConverter) ConvertInternationalDateTimeStringToAmerican(value any) (any, error) {
+	convertedTime, err := tc.ConvertStringToTime(value)
 	if err != nil {
 		return nil, err
 	}
 
-	return convertedTime.Format("2006-02-01 15:04:05"), nil
+	return convertedTime.(time.Time).Format("2006-02-01 15:04:05"), nil
 }
 
 func (typeConverter) ConvertStringToInt(value any) (any, error) {
