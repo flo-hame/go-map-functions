@@ -28,8 +28,24 @@ func GetValueByFieldPathDotNotation(fieldPath string, mapStructure map[string]an
 			return nil, err
 		}
 		if indexAccess != nil {
-			// if it is an index access path
-			value = value.([]any)[*indexAccess]
+			switch typedValue := value.(type) {
+			case []any:
+				value = typedValue[*indexAccess]
+			case []map[string]any:
+				value = typedValue[*indexAccess]
+			case []string:
+				value = typedValue[*indexAccess]
+			case []int:
+				value = typedValue[*indexAccess]
+			case []int32:
+				value = typedValue[*indexAccess]
+			case []int64:
+				value = typedValue[*indexAccess]
+			case []float32:
+				value = typedValue[*indexAccess]
+			case []float64:
+				value = typedValue[*indexAccess]
+			}
 			continue
 		}
 
