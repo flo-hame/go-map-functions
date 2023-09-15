@@ -52,7 +52,7 @@ func NewTypeConverter(convertFunctionMap map[string]map[string]func(value any) (
 				"int":                    tc.ConvertStringToInt,
 				"datetime":               tc.ConvertStringToTime,
 				"date":                   tc.ConvertDateTimeStringToDateString,
-				"time":                   tc.ConvertDateTimeStringToDateString,
+				"time":                   tc.ConvertDateTimeStringToTimeString,
 				"americanDateTimeString": tc.ConvertInternationalDateTimeStringToAmerican,
 				"[]string":               tc.ConvertStringToStringSlice,
 				"float64":                tc.ConvertStringToFloat64,
