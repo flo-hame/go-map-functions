@@ -162,6 +162,9 @@ func (tc typeConverter) ConvertInternationalDateTimeStringToAmerican(value any) 
 }
 
 func (typeConverter) ConvertStringToInt(value any) (any, error) {
+	if len(strings.TrimSpace(value.(string))) == 0 {
+		return 0, nil
+	}
 	return strconv.Atoi(value.(string))
 }
 
@@ -210,10 +213,16 @@ func (typeConverter) ConvertStringToStringSlice(value any) (any, error) {
 }
 
 func (typeConverter) ConvertStringToFloat64(value any) (any, error) {
+	if len(strings.TrimSpace(value.(string))) == 0 {
+		return 0.0, nil
+	}
 	return strconv.ParseFloat(value.(string), 64)
 }
 
 func (typeConverter) ConvertStringToFloat32(value any) (any, error) {
+	if len(strings.TrimSpace(value.(string))) == 0 {
+		return 0.0, nil
+	}
 	return strconv.ParseFloat(value.(string), 32)
 }
 
