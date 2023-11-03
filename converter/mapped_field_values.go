@@ -21,8 +21,10 @@ func (tc typeConverter) GetMappedFieldValue(mapping FieldMapping, originalValue 
 	if err != nil {
 		return nil, err
 	}
-	if convertedValue == nil {
-		return nil, err
+	if convertedValue == nil && mapping.Default != nil {
+		return tc.ConvertValue(*mapping.Default, targetType, tc.convertFunctionMap)
+	} else if convertedValue == nil {
+		return nil, nil
 	}
 
 	if mapping.ValueMapping != nil && len(mapping.ValueMapping.Mapping) > 0 {

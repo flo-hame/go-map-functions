@@ -5,6 +5,7 @@ type FieldMapping struct {
 	Type         *string            `json:"type,omitempty"`
 	FixValue     *string            `json:"fix_value,omitempty"`
 	ValueMapping *FieldValueMapping `json:"value_mapping,omitempty"`
+	Default      *string            `json:"default"`
 }
 
 type FieldValueMapping struct {
