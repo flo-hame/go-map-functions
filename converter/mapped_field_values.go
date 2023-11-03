@@ -25,8 +25,8 @@ func (tc typeConverter) GetMappedFieldValue(mapping FieldMapping, originalValue 
 		return nil, err
 	}
 
-	if mapping.ValueMapping != nil && len(mapping.ValueMapping) > 0 {
-		for _, valueMapping := range mapping.ValueMapping {
+	if mapping.ValueMapping != nil && len(mapping.ValueMapping.Mapping) > 0 {
+		for _, valueMapping := range mapping.ValueMapping.Mapping {
 			source, err := tc.ConvertValue(valueMapping.Source, targetType, tc.convertFunctionMap)
 			if err != nil {
 				return nil, err
@@ -34,6 +34,9 @@ func (tc typeConverter) GetMappedFieldValue(mapping FieldMapping, originalValue 
 			if source == convertedValue {
 				return tc.ConvertValue(valueMapping.Target, targetType, tc.convertFunctionMap)
 			}
+		}
+		if mapping.ValueMapping.Default != nil {
+			return tc.ConvertValue(*mapping.ValueMapping.Default, targetType, tc.convertFunctionMap)
 		}
 		return nil, nil
 	}
