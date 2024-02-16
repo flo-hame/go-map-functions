@@ -60,9 +60,10 @@ func NewTypeConverter(convertFunctionMap map[string]map[string]func(value any) (
 				"boolean":                tc.ConvertStringToBoolean,
 			},
 			"*string": {
-				"string":  tc.GetStringFromStringPtr,
-				"varchar": tc.GetStringFromStringPtr,
-				"int":     tc.ConvertStringPtrToInt,
+				"string":   tc.GetStringFromStringPtr,
+				"varchar":  tc.GetStringFromStringPtr,
+				"int":      tc.ConvertStringPtrToInt,
+				"[]string": tc.ConvertStringPtrToStringSlice,
 			},
 			"int": {
 				"string":  tc.ConvertIntToString,
@@ -212,6 +213,13 @@ func (typeConverter) ConvertTimeToString(value any) (any, error) {
 
 func (typeConverter) ConvertStringToStringSlice(value any) (any, error) {
 	return strings.Split(value.(string), ","), nil
+}
+
+func (typeConverter) ConvertStringPtrToStringSlice(value any) (any, error) {
+	if value.(*string) == nil {
+		return "", nil
+	}
+	return strings.Split(*value.(*string), ","), nil
 }
 
 func (typeConverter) ConvertStringToBoolean(value any) (any, error) {
