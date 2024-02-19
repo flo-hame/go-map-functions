@@ -52,13 +52,14 @@ func (tc typeConverter) GetMappedFieldValue(mapping FieldMapping, originalValue 
 
 func (tc typeConverter) convertSliceValueMapping(convertedValue any, valueMappings []Mapping, targetType string) (any, error) {
 	var convertedValues []any
-	for _, val := range convertedValue.([]any) {
+	convertedVal := reflect.ValueOf(convertedValue)
+	for i := 0; i < convertedVal.Len(); i++ {
 		for _, valueMapping := range valueMappings {
 			source, err := tc.ConvertValue(valueMapping.Source, targetType, tc.convertFunctionMap)
 			if err != nil {
 				return nil, err
 			}
-			if source == val {
+			if source == convertedVal.Index(i).Interface() {
 				convertedValues = append(convertedValues, source)
 			}
 		}
