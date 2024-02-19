@@ -59,7 +59,11 @@ func (tc typeConverter) convertSliceValueMapping(convertedValue any, valueMappin
 			if err != nil {
 				return nil, err
 			}
-			if source == convertedVal.Index(i).Interface() {
+			v := source
+			if reflect.TypeOf(source).Kind() == reflect.Slice {
+				v = reflect.ValueOf(source).Index(0).Interface()
+			}
+			if v == convertedVal.Index(i).Interface() {
 				convertedValues = append(convertedValues, source)
 			}
 		}
