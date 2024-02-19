@@ -28,6 +28,10 @@ func (tc typeConverter) GetMappedFieldValue(mapping FieldMapping, originalValue 
 	}
 
 	if mapping.ValueMapping != nil && len(mapping.ValueMapping.Mapping) > 0 {
+		if reflect.TypeOf(convertedValue).Kind() == reflect.Slice {
+			return tc.convertSliceValueMapping(convertedValue, mapping.ValueMapping.Mapping, targetType)
+		}
+
 		for _, valueMapping := range mapping.ValueMapping.Mapping {
 			source, err := tc.ConvertValue(valueMapping.Source, targetType, tc.convertFunctionMap)
 			if err != nil {
@@ -44,6 +48,22 @@ func (tc typeConverter) GetMappedFieldValue(mapping FieldMapping, originalValue 
 	}
 
 	return convertedValue, nil
+}
+
+func (tc typeConverter) convertSliceValueMapping(convertedValue any, valueMappings []Mapping, targetType string) (any, error) {
+	var convertedValues []any
+	for _, val := range convertedValue.([]any) {
+		for _, valueMapping := range valueMappings {
+			source, err := tc.ConvertValue(valueMapping.Source, targetType, tc.convertFunctionMap)
+			if err != nil {
+				return nil, err
+			}
+			if source == val {
+				convertedValues = append(convertedValues, source)
+			}
+		}
+	}
+	return convertedValues, nil
 }
 
 // ConvertValue convert the input value to input target type by using the given converting functions
